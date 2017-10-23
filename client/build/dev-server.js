@@ -25,13 +25,13 @@ const proxyTable = config.dev.proxyTable
 
 const app = express()
 const compiler = webpack(webpackConfig)
-
-var goodsData = require('../mock/mock-goods.json');
-var router = express.Router();
-router.get("/goods", function(req, res, next) {
-    res.json(goodsData);
-})
-app.use(router);
+// 2017-10-23 14:51 修改  使用3000端口
+//var goodsData = require('../mock/mock-goods.json');
+//var router = express.Router();
+//router.get("/goods", function(req, res, next) {
+//  res.json(goodsData);
+//})
+//app.use(router);
 const devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
   quiet: true

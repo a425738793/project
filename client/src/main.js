@@ -3,8 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueLazyload from 'vue-lazyload'
 import '../static/css/index.css'
-
+Vue.use(VueLazyload,{
+	loading: '../static/img/ok-2.png'
+})
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

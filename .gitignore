@@ -1,4 +1,6 @@
 <<<<<<< HEAD
 client/node_modules/
 shop-static/
+node_modules/
+server/node_modules/
 >>>>>>> project
