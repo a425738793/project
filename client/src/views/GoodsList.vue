@@ -111,7 +111,7 @@
                 	currentPage: this.page,
                 	pageSize: this.pageSize
                 }
-                axios.get('goods/list',{params:param}).then(res=>{
+                this.$http.get('goods/list',{params:param}).then(res=>{
                 	if (flag) {
                 		this.goodsList = this.goodsList.concat(res.data.result);
                 		if (res.data.result == 0) {
@@ -132,6 +132,7 @@
             	this.getGoodsList();
             },
             setPrice(index){
+            	this.page = 1;
             	this.pramCheckout = index;
             	this.getGoodsList();
             },
@@ -150,8 +151,12 @@
 		      }, 1000);
 		   },
 		   addCart(productId){
+		   	
 		   	axios.post('/goods/addCart',{productId:productId}).then(res=>{
-		   		console.log(res.data);
+		   		console.log(res);
+		   		if(res.data.status == 1){
+		   			alert(res.data.msg)
+		   		}
 		   		if (res.data.status == 0) {
 		   			alert(res.data.result);
 		   		}

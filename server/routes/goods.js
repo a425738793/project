@@ -73,8 +73,7 @@ router.get('/list',function(req,res,nrext){
 router.post('/addCart',function(req,res,next){
 	var productId = req.body.productId;
 	
-	var userId = 100000077;
-	
+	var userId = req.cookies.userId;	
 	User.findOne({userId:userId},function(err,userDoc){
 		
 		let goodItem = '';
@@ -113,7 +112,7 @@ router.post('/addCart',function(req,res,next){
 })
 
 router.get('/cartList',function(req,res,next){
-	var userId = 100000077;
+	var userId = req.cookies.userId;
 	User.findOne({userId:userId},function(err,doc){
 		res.json({
 			status: '0',
