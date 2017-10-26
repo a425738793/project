@@ -94,6 +94,7 @@ router.post('/addCart',function(req,res,next){
 		}else{
 			Goods.findOne({'productId':productId},function(err,goodsDoc){
 				goodsDoc.productNum =1;
+				goodsDoc.checked = 0;
 				userDoc.cartList.push(goodsDoc)
 				userDoc.save(function(err2,doc2){
 					res.json({

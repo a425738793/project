@@ -39,7 +39,8 @@ router.post('/login',function(req,res,next){
 					status: 0,
 					msg: '',
 					result: {
-						userName:doc.userName
+						userName:doc.userName,
+						cartNum: doc.cartList.length
 					}
 				})
 			}
@@ -48,10 +49,28 @@ router.post('/login',function(req,res,next){
 })
 router.post('/checkLogin',function(req,res,next){
 		if (req.cookies.userId) {
-			res.json({
-				status: '0',
-				result: req.cookies.userName
+			User.findOne({userId:req.cookies.userId},function(err,doc){
+				if (err) {
+					res.json({
+						status: '1',
+						msg: err.message,
+						result:''
+					})
+				}else{
+					res.json({
+						status: '0',
+						msg: '',
+						result:{
+							userName: doc.userName,
+							cartNum:doc.cartList.length
+						}
+					})
+				}
 			})
+//			res.json({
+//				status: '0',
+//				result: req.cookies.userName
+//			})
 		}else{
 				res.json({
 					status: 1,
@@ -73,6 +92,127 @@ router.post('/logout',function(req,res,next){
 		status: 0,
 		msg:'',
 		result:'退出成功'
+	})
+})
+
+router.post('/cartEdit',function(req,res,next){
+	let userId = req.cookies.userId,
+	productId = req.body.productId,
+	checked = req.body.checked,
+	productNum = req.body.productNum;
+	User.update({'userId':userId,'cartList.productId':productId},{
+		'cartList.$.productNum':productNum,
+		'cartList.$.checked':checked
+	},function(err,doc){
+		if (err) {
+			res.json({
+				status:'1',
+				msg:err.message,
+				result:''
+			})
+		}else{
+			res.json({
+				status:'0',
+				msg:'',
+				result:'购物车修改成功'
+			})
+		}
+	})
+})
+router.post('/editCheckAll',function(req,res,next){
+	let userId = req.cookies.userId,
+	checkAll = req.body.checkAll;
+	console.log(checkAll);
+	User.findOne({'userId':userId},function(err,doc){
+		
+		if (err) {
+			res.json({
+				status: '1',
+				msg: err.message,
+				result:''
+			})
+		}else{
+			console.log(doc.cartList)
+			doc.cartList.forEach(item=>{
+				item.checked = checkAll;
+			})
+			doc.save(function (err1,doc1) {
+				if(err1){
+					res.json({
+						status: '1',
+						msg: err.message,
+						result:''
+					})
+				}else{
+					res.json({
+						status: 0,
+						msg: '',
+						result: '操作成功'
+					})
+				}
+			})
+		}
+	})
+})
+router.post('/cartDel',function(req,res,next){
+	let userId = req.cookies.userId,
+	productId = req.body.productId;
+	User.update({userId: userId},{
+		$pull: {
+			'cartList':{
+				'productId': productId
+			}
+		}
+	},function(err,doc){
+		if(err){
+			res.json({
+				status: 1,
+				msg: err.message,
+				result:''
+			})
+		}else{
+			res.json({
+				status: 1,
+				msg:'',
+				result:'商品删除成功'
+			})
+		}
+	})
+})
+router.post('/addressDefault',function(req,res,next){
+	let userId = req.cookies.userId,
+	addressId = req.body.addressId;
+	User.findOne({userId: userId},function(err,doc){
+		if(err){
+			res.json({
+				status: 1,
+				msg: err.message,
+				result:''
+			})
+		}else{
+			doc.addressList.forEach(item=>{
+				item.isDefault = false;
+				if (item.addressId == addressId) {
+					item.isDefault = true;
+				}
+			})
+			doc.save(function(err1,doc1){
+				if(err1){
+					res.json({
+						status: '1',
+						msg: err.message,
+						result:''
+					})
+				}else{
+					res.json({
+						status: 0,
+						msg: '',
+						result: '操作成功'
+					})
+				}
+			})
+			
+		}
 	})
 })
 module.exports = router;

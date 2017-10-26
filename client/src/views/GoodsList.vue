@@ -49,7 +49,19 @@
 	            </div>
 	        </div>
 	    </div>
-
+		<modal :mdShow="mdShow">
+			<p slot="message">请先登录，否则无法加入购物车</p>
+	        <div slot="btnGroup">
+	            <a href="javascript:;" class="btn  btn--m" @click="mdShow = false">关闭</a>
+	        </div>
+		</modal>
+		<modal :mdShow="mdShowCart">
+			<p slot="message">加入购物车成功</p>
+	        <div slot="btnGroup">
+	            <a href="javascript:;" class="btn  btn--m" @click="mdShowCart = false">继续购物</a>
+	            <router-link class="btn  btn--m" to="/cart">查看购物车列表</router-link>
+	        </div>
+		</modal>
 		<footer-hrader/>
 	</div>
 </template>
@@ -58,17 +70,14 @@
 	import NavHrader from '@/components/Header'
 	import FooterHrader from '@/components/Footer'
 	import NavBard from '@/components/NavBard'
+	import Modal from '@/components/Modal'
 	import axios from 'axios'
-//	import '../../static/css/base.css'
-//	import '../../static/css/product.css'
-//	import '../../static/css/checkout.css'
-//	import '../../static/css/login.css'
-//	import '../../static/css/style.css'
 	export default {
 		components:{
 			NavHrader,
 			FooterHrader,
-			NavBard
+			NavBard,
+			Modal
 		},
 		data(){
 			return {
@@ -77,7 +86,9 @@
 				data: [],
     			busy: true,
     			page: 1,
-    			pageSize: 4,
+    			pageSize: 8,
+    			mdShow:false,
+    			mdShowCart:false,
 				pramList: [
 					{
 						startPrice: 0,
@@ -129,6 +140,7 @@
             },
             sortGoods(){
             	this.sortFlag = !this.sortFlag;
+            	this.page = 1
             	this.getGoodsList();
             },
             setPrice(index){
@@ -155,10 +167,10 @@
 		   	axios.post('/goods/addCart',{productId:productId}).then(res=>{
 		   		console.log(res);
 		   		if(res.data.status == 1){
-		   			alert(res.data.msg)
+		   			this.mdShow = true
 		   		}
 		   		if (res.data.status == 0) {
-		   			alert(res.data.result);
+		   			this.mdShowCart = true
 		   		}
 		   	})
 		   }

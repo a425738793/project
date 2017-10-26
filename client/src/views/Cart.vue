@@ -1,6 +1,6 @@
 <template>
 	<div class="checkout cart-page">
-		<NavHrader/>
+		<NavHrader ref="heda"/>
     <nav-bard>购物车</nav-bard>
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -79,9 +79,9 @@
                                 <div class="item-quantity">
                                     <div class="select-self select-self-open">
                                         <div class="select-self-area">
-                                            <a class="input-sub">-</a>
+                                            <a class="input-sub" @click="editCart('minu',item)">-</a>
                                             <span class="select-ipt">{{item.productNum}}</span>
-                                            <a class="input-add">+</a>
+                                            <a class="input-add" @click="editCart('add',item)">+</a>
                                         </div>
                                     </div>
                                 </div>
@@ -91,7 +91,7 @@
                             </div>
                             <div class="cart-tab-5">
                                 <div class="cart-item-opration">
-                                    <a href="javascript:;" class="item-edit-btn">
+                                    <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item)">
                                         <svg class="icon icon-del">
                     <use xlink:href="#icon-del"></use>
                   </svg>
@@ -106,8 +106,8 @@
                 <div class="cart-foot-inner">
                     <div class="cart-foot-l">
                         <div class="item-all-check">
-                            <a href="javascipt:;">
-                                <span class="checkbox-btn item-check-btn">
+                            <a href="javascipt:;" @click="toggleCheckAll">
+                                <span class="checkbox-btn item-check-btn" :class="{'checked': checkedAllFlag}">
                       <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
                   </span>
                                 <span>Select all</span>
@@ -116,18 +116,24 @@
                     </div>
                     <div class="cart-foot-r">
                         <div class="item-total">
-                            Item total: <span class="total-price">500</span>
+                            Item total: <span class="total-price">{{totalPrice}}</span>
                         </div>
                         <div class="btn-wrap">
-                            <a class="btn btn--red">Checkout</a>
+                            <a class="btn btn--red" @click="checkout">Checkout</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <FooterHrader/>
+		<modal :mdShow='modalConfirm'>
+			<div slot="message">确定删除么？</div>
+			<div slot="btnGroup">
+				<a href="javascript:;" class="btn  btn--m" @click="delCart">确定</a>
+				<a href="javascript:;" class="btn  btn--m" @click="modalConfirm=false">取消</a>
+			</div>
+		</modal>
+    <footer-hrader/>
 	</div>
 </template>
 
@@ -135,16 +141,45 @@
 	import NavHrader from '@/components/Header'
 	import FooterHrader from '@/components/Footer'
 	import NavBard from '@/components/NavBard'
+	import Modal from '@/components/Modal'
 	import axios from 'axios'
 	export default {
 		components:{
 			NavHrader,
 			FooterHrader,
-			NavBard
+			NavBard,
+			Modal
 		},
 		data: function(){
 			return {
-				cartList: {}
+				cartList: {},
+				modalConfirm: false,
+				productId: ''
+			}
+		},
+		computed: {
+			checkedCount(){
+					var i = 0;
+					
+					this.cartList.forEach(item=>{
+						if (item.checked == '1') {
+							i++
+						}
+					})
+					return i;
+			},
+			checkedAllFlag(){
+				
+				return this.cartList.length == this.checkedCount;
+			},
+			totalPrice(){
+				let sum = 0;
+				this.cartList.forEach(item=>{
+					if (item.checked == '1') {
+						sum+= item.productNum*item.salePrice;
+					}
+				})
+				return sum;
 			}
 		},
 		created(){
@@ -154,8 +189,61 @@
 			cart(){
 				axios.get('goods/cartList').then(res=>{
 					console.log(res);
+					if (res.data.status == 1) {
+						alert('当前用户未登录，请登录')
+//						this.$router.push =({path:'/address'});
+						
+					}
 					this.cartList = res.data.result.cartList;
 				})
+			},
+			editCart(flag,item){
+				if (flag == 'minu') {
+					if (item.productNum <= 1) {
+						return;
+					}
+					item.productNum --;
+				}else if(flag == 'add'){
+					item.productNum ++;
+				}else{
+					item.checked = item.checked == '1' ? 0 : 1
+				}
+//				console.log(item.productId);
+				this.$http.post('/users/cartEdit',{productId:item.productId,productNum:item.productNum,checked:item.checked}).then(res=>{
+					console.log(res)
+				})
+			},
+			toggleCheckAll(){
+				let flag = !this.checkedAllFlag;
+				this.cartList.forEach(item=>{
+					item.checked = flag ? 1 : 0;
+				})
+				let checked = flag ? 1 : 0
+				this.$http.post('/users/editCheckAll',{checkAll:checked}).then(res=>{
+					console.log(res);
+				})
+			},
+			delCartConfirm(item){
+				this.productId = item.productId;
+				console.log(this.productId)
+				this.modalConfirm = true
+			},
+			delCart(){
+				this.$http.post('/users/cartDel',{productId: this.productId}).then(res=>{
+//					alert(res.data.result)
+					this.modalConfirm = false
+					this.cart()
+				})
+			},
+			checkout(){
+				if(this.checkedCount > 0){
+					alert(123)
+					 this.$router.push({
+                        path:'/address'
+                    })
+				}else{
+					alert('购物车必须有选中商品才可结算')
+				}
 			}
 		}
 	}

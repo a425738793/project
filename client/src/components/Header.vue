@@ -30,8 +30,8 @@
 	            </div>
 	            <!-- <div class="container-user"> -->
 	            <div class="topbar-cart" id="ECS_CARTINFO">
-	                <router-link  to='cart'> <i class="iconfont">&#xe60c;</i> 购物车
-	                    <span class="mini-cart-num J_cartNum" id="hd_cartnum">(0)</span></router-link>
+	                <a href="javascript:;" @click="toCart"> <i class="iconfont">&#xe60c;</i> 购物车
+	                    <span class="mini-cart-num J_cartNum" id="hd_cartnum">({{cartNum}})</span></a>
 	                   
 	               
 	            </div>
@@ -90,7 +90,8 @@
 				userName: '',
 				userPwd: '',
 				nikeName: '',
-				inx: false
+				inx: false,
+				cartNum: 0
 			}
 		},
 		created(){
@@ -101,20 +102,37 @@
 				
 				axios.post('users/login',{userName:this.userName,userPwd:this.userPwd}).then(res=>{
 					this.nikeName = res.data.result.userName
+					this.cartNum = res.data.result.cartNum
 					this.inx = false
 					console.log(this.nikeName)
 				})
 			},
 			checkLogin(){
 				axios.post('users/checkLogin').then(res=>{
-					this.nikeName = res.data.result
+					console.log(res)
+					if (res.data.result) {
+						this.nikeName = res.data.result.userName
+						this.cartNum = res.data.result.cartNum
+					}
+					
 				})
 			},
 			loginout(){
 				axios.post('users/logout').then(res=>{
 					console.log(res.data.result)
 					this.nikeName = '';
+					this.cartNum = 0
 				})
+			},
+			toCart(){
+				if (document.cookie) {
+					this.$router.push({
+						path:'/cart'
+					})
+				}else{
+					alert("请登录")
+					this.inx = true
+				}
 			}
 		}
 	}
