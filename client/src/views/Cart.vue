@@ -237,7 +237,6 @@
 			},
 			checkout(){
 				if(this.checkedCount > 0){
-					alert(123)
 					 this.$router.push({
                         path:'/address'
                     })

@@ -115,11 +115,20 @@ router.post('/addCart',function(req,res,next){
 router.get('/cartList',function(req,res,next){
 	var userId = req.cookies.userId;
 	User.findOne({userId:userId},function(err,doc){
-		res.json({
-			status: '0',
-			msg:'',
-			result: doc
-		})
+		if (err) {
+			res.json({
+				status: '1',
+				msg: err.message,
+				resule:''
+			})
+		}else{
+			res.json({
+				status: '0',
+				msg:'',
+				result: doc
+			})
+		}
+			
 	})
 })
 

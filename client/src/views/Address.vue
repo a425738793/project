@@ -58,19 +58,19 @@
       <div class="addr-list-wrap">
         <div class="addr-list">
           <ul>
-            <li v-for="(item,index) in addList" :key="index" :class="{'check': item.isDefault}" @click="setDefault(item.addressId)" >
+            <li v-for="(item,index) in addList" :key="index" :class="{'check': item.isDefault}"  >
               <dl>
                 <dt>{{item.userName}}</dt>
                 <dd class="address">{{item.streetName}}</dd>
                 <dd class="tel">{{item.tel}}</dd>
               </dl>
               <div class="addr-opration addr-del">
-                <a href="javascript:;" class="addr-del-btn">
+                <a href="javascript:;" class="addr-del-btn" @click="delAddress(item.addressId)">
                   <svg class="icon icon-del"><use xlink:href="#icon-del"></use></svg>
                 </a>
               </div>
               <div class="addr-opration addr-set-default">
-                <a href="javascript:;" class="addr-set-default-btn"><i>Set default</i></a>
+                <a href="javascript:;" @click="setDefault(item.addressId)" class="addr-set-default-btn"><i>Set default</i></a>
               </div>
               <div class="addr-opration addr-default" v-if="item.isDefault">Default address</div>
             </li>
@@ -117,7 +117,8 @@
         </div>
       </div>
       <div class="next-btn-wrap">
-        <a class="btn btn--m btn--red">Next</a>
+      	<router-link :to="{path:'orderConfirm',query:{'addressId':this.addressId}}" class="btn btn--m btn--red">Next</router-link>
+        <!--<a class="btn btn--m btn--red">Next</a>-->
       </div>
     </div>
   </div>
@@ -143,7 +144,8 @@
 		data: function(){
 			return {
 				addList: {},
-				isDefault: false
+				isDefault: false,
+				addressId: ''
 			}
 		},
 		created(){
@@ -154,13 +156,26 @@
 				this.$http.get('/goods/cartList').then(res=>{
 					
 					this.addList = res.data.result.addressList;
-					
+					console.log(this.addList)
+					this.addList.forEach(item=>{
+						if (item.isDefault) {
+							console.log(item.addressId)
+							this.addressId = item.addressId
+						}
+					})
 				})
 			},
 			setDefault(addId){
+				this.addressId = addId;
 				this.$http.post('/users/addressDefault',{addressId: addId}).then(res=>{
 					console.log(res)
 					this.getAddress()
+//					this.addressId = addId;
+				})
+			},
+			delAddress(addressId){
+				this.$http.post('/users/deleAddress',{addressId:addressId}).then(res=>{
+					console.log(res.data.result)
 				})
 			}
 		}
