@@ -3,7 +3,7 @@
 		<div class="site-header" style="clear:both;">
 	        <div class="container">
 	            <div class="header-logo">
-	                <a href="index.php" title="小米官网"><img src="static/img/20171106110915-66847.jpg" /></a>
+	                <a href="index.php" title="小米官网"><img src="static/img/logo.png" /></a>
 	            </div>
 	            <div class="header-nav">
 	                <ul class="nav-list">

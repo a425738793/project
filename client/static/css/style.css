@@ -1261,7 +1261,10 @@ a:hover {
     width: 62px;
     margin-top: 22px;
 }
-
+.site-header .header-logo img{
+	height: 55px;
+	width: 100px;
+}
 .site-header .header-logo a {
     display: block;
 }
