@@ -9,6 +9,7 @@ import infiniteScroll from 'vue-infinite-scroll'
 import apiConfig from '../config/api.config'
 import Axios from 'axios'
 import VueAxios from 'vue-axios'
+import 'babel-polyfill'
 
 Vue.use(VueAxios, Axios)
 Axios.defaults.baseURL = apiConfig.baseUrl
